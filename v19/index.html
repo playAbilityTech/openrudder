@@ -1,0 +1,818 @@
+<!doctype html>
+<html style="scrollbar-gutter: stable both-edges;">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <title>HID Remapper Configuration</title>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
+    <script src="code.js" type="module"></script>
+    <script src="nus-tester.js" type="module"></script>
+</head>
+
+<body>
+
+    <div class="container d-flex flex-column" style="max-width: 720px; min-height: 100vh;">
+
+        <h1 class="mt-sm-5 mt-3">HID Remapper Configuration</h1>
+
+        <div class="row my-4">
+            <div class="col">
+                <button id="open_device" type="button" class="btn btn-primary w-100">Open device</button>
+            </div>
+            <div class="col">
+                <button id="load_from_device" type="button" class="btn btn-primary w-100">Load from device</button>
+            </div>
+            <div class="col">
+                <button id="save_to_device" type="button" class="btn btn-primary w-100 position-relative">
+                    <span id="save_to_device_checkmark" class="position-absolute top-0 start-100 translate-middle badge bg-success rounded-pill hub_port_badge d-none">&check;</span>
+                    <span>Save to device</span>
+                </button>
+            </div>
+        </div>
+
+        <div id="error" class="alert alert-danger d-none"></div>
+
+        <div class="nav nav-tabs" id="nav-tab" role="tablist">
+            <button class="nav-link active" id="nav-mappings-tab" data-bs-toggle="tab" data-bs-target="#nav-mappings" type="button" role="tab">Mappings</button>
+            <button class="nav-link" id="nav-settings-tab" data-bs-toggle="tab" data-bs-target="#nav-settings" type="button" role="tab">Settings</button>
+            <button class="nav-link" id="nav-macros-tab" data-bs-toggle="tab" data-bs-target="#nav-macros" type="button" role="tab">Macros</button>
+            <button class="nav-link" id="nav-expressions-tab" data-bs-toggle="tab" data-bs-target="#nav-expressions" type="button" role="tab">Expressions</button>
+            <button class="nav-link" id="nav-actions-tab" data-bs-toggle="tab" data-bs-target="#nav-actions" type="button" role="tab">Actions</button>
+            <button class="nav-link" id="nav-monitor-tab" data-bs-toggle="tab" data-bs-target="#nav-monitor" type="button" role="tab">Monitor</button>
+            <button class="nav-link" id="nav-bluetooth-tab" data-bs-toggle="tab" data-bs-target="#nav-bluetooth" type="button" role="tab">Bluetooth</button>
+            <button class="nav-link" id="nav-examples-tab" data-bs-toggle="tab" data-bs-target="#nav-examples" type="button" role="tab">Examples</button>
+        </div>
+
+        <div class="tab-content flex-grow-1">
+
+            <div class="tab-pane active" id="nav-mappings" role="tabpanel" tabindex="0">
+
+                <div class="row pb-2 mt-3" style="overflow-x: auto;">
+                    <div style="min-width: 720px; width: 100%;">
+                        <div class="row my-2 align-items-end">
+                            <div class="col-1"></div>
+                            <div class="col-3 text-center"><a href="#" id="input-column-header" class="text-decoration-none text-reset d-block">Input</a></div>
+                            <div class="col-3 text-center"><a href="#" id="output-column-header" class="text-decoration-none text-reset d-block">Output</a></div>
+                            <div class="col-3">
+                                <div class="d-flex align-items-end">
+                                    <div class="flex-fill text-center"><a href="#" id="layer-column-header" class="text-decoration-none text-reset d-block">Layer</a></div>
+                                    <div class="text-start pt-1" style="writing-mode: vertical-rl; transform: rotate(180deg); line-height: 1.2em;">Sticky<br>Tap<br>Hold</div>
+                                </div>
+                            </div>
+                            <div class="col-2 text-center">Scaling</div>
+                        </div>
+
+                        <div id="mappings">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center mt-2 mb-3">
+                    <button id="add_mapping" type="button" class="btn btn-primary">Add mapping</button>
+                </div>
+
+            </div>
+
+            <div class="tab-pane" id="nav-settings" role="tabpanel" tabindex="0">
+
+                <div class="row mt-4">
+                    <div class="col-4 text-end">
+                        Unmapped inputs passthrough on layer
+                    </div>
+                    <div class="col-8">
+                        <div class="form-check form-check-inline">
+                            <input type="checkbox" id="unmapped_passthrough_checkbox0" class="form-check-input">
+                            <label for="unmapped_passthrough_checkbox0" class="form-check-label">0</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input type="checkbox" id="unmapped_passthrough_checkbox1" class="form-check-input">
+                            <label for="unmapped_passthrough_checkbox1" class="form-check-label">1</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input type="checkbox" id="unmapped_passthrough_checkbox2" class="form-check-input">
+                            <label for="unmapped_passthrough_checkbox2" class="form-check-label">2</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input type="checkbox" id="unmapped_passthrough_checkbox3" class="form-check-input">
+                            <label for="unmapped_passthrough_checkbox3" class="form-check-label">3</label>
+                        </div>
+                        <div class="form-check form-check-inline d-none">
+                            <input type="checkbox" id="unmapped_passthrough_checkbox4" class="form-check-input">
+                            <label for="unmapped_passthrough_checkbox4" class="form-check-label">4</label>
+                        </div>
+                        <div class="form-check form-check-inline d-none">
+                            <input type="checkbox" id="unmapped_passthrough_checkbox5" class="form-check-input">
+                            <label for="unmapped_passthrough_checkbox5" class="form-check-label">5</label>
+                        </div>
+                        <div class="form-check form-check-inline d-none">
+                            <input type="checkbox" id="unmapped_passthrough_checkbox6" class="form-check-input">
+                            <label for="unmapped_passthrough_checkbox6" class="form-check-label">6</label>
+                        </div>
+                        <div class="form-check form-check-inline d-none">
+                            <input type="checkbox" id="unmapped_passthrough_checkbox7" class="form-check-input">
+                            <label for="unmapped_passthrough_checkbox7" class="form-check-label">7</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-4 text-end">
+                        <label for="partial_scroll_timeout_input" class="col-form-label">Partial scroll timeout</label>
+                    </div>
+                    <div class="col-auto">
+                        <div class="input-group">
+                            <input type="number" id="partial_scroll_timeout_input" class="form-control text-end" style="max-width: 100px;">
+                            <span class="input-group-text">ms</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-4 text-end">
+                        <label for="tap_hold_threshold_input" class="col-form-label">Tap-hold threshold</label>
+                    </div>
+                    <div class="col-auto">
+                        <div class="input-group">
+                            <input type="number" id="tap_hold_threshold_input" class="form-control text-end" style="max-width: 100px;">
+                            <span class="input-group-text">ms</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-4 text-end">
+                        <label for="gpio_debounce_time_input" class="col-form-label">GPIO debounce time</label>
+                    </div>
+                    <div class="col-auto">
+                        <div class="input-group">
+                            <input type="number" id="gpio_debounce_time_input" class="form-control text-end" style="max-width: 100px;">
+                            <span class="input-group-text">ms</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-4 text-end">
+                        <label for="macro_entry_duration_input" class="col-form-label">Macro step duration</label>
+                    </div>
+                    <div class="col-auto">
+                        <div class="input-group">
+                            <input type="number" min="1" max="256" id="macro_entry_duration_input" class="form-control text-end" style="max-width: 100px;">
+                            <span class="input-group-text">ms</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-4 text-end">
+                        <label for="interval_override_dropdown" class="col-form-label">Override polling rate</label>
+                    </div>
+                    <div class="col-auto">
+                        <select class="form-select" id="interval_override_dropdown">
+                            <option value="0">don't override</option>
+                            <option value="16">62.5 Hz</option>
+                            <option value="8">125 Hz</option>
+                            <option value="4">250 Hz</option>
+                            <option value="2">500 Hz</option>
+                            <option value="1">1000 Hz</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-4 text-end">
+                        <label for="our_descriptor_number_dropdown" class="col-form-label">Emulated device type</label>
+                    </div>
+                    <div class="col-auto">
+                        <select class="form-select" id="our_descriptor_number_dropdown">
+                            <option value="0">Mouse and keyboard</option>
+                            <option value="1">Absolute mouse and keyboard</option>
+                            <option value="2">Switch gamepad</option>
+                            <option value="3">PS4 arcade stick</option>
+                            <option value="4">Stadia controller</option>
+                            <option value="5">XAC/Flex compatible</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-4 text-end">
+                        <label for="input_labels_dropdown" class="col-form-label">Input labels</label>
+                    </div>
+                    <div class="col-auto">
+                        <select class="form-select" id="input_labels_dropdown">
+                            <option value="0">mouse</option>
+                            <option value="1">gamepad</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-4 text-end">
+                        <label for="gpio_output_mode_dropdown" class="col-form-label">GPIO output mode</label>
+                    </div>
+                    <div class="col-auto">
+                        <select class="form-select" id="gpio_output_mode_dropdown">
+                            <option value="0">0=low, 1=high</option>
+                            <option value="1">0=high impedance, 1=low</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-4 text-end">
+                        <label for="ignore_auth_dev_inputs_checkbox" class="col-form-label">Ignore auth device inputs</label>
+                    </div>
+                    <div class="col-auto">
+                        <input type="checkbox" id="ignore_auth_dev_inputs_checkbox" class="form-check-input align-middle">
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-4 text-end">
+                        <label for="normalize_gamepad_inputs_checkbox" class="col-form-label">Normalize gamepad inputs</label>
+                    </div>
+                    <div class="col-auto">
+                        <input type="checkbox" id="normalize_gamepad_inputs_checkbox" class="form-check-input align-middle">
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-4 text-end">
+                        <label for="imu_enabled_checkbox" class="col-form-label">Enable IMU (xiao ble sense only)</label>
+                    </div>
+                    <div class="col-auto">
+                        <input type="checkbox" id="imu_enabled_checkbox" class="form-check-input align-middle">
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-4 text-end">
+                        <label for="imu_angle_clamp_limit_input" class="col-form-label">IMU max angle</label>
+                    </div>
+                    <div class="col-auto">
+                        <div class="input-group">
+                            <input type="number" min="1" max="90" id="imu_angle_clamp_limit_input" class="form-control text-end" style="max-width: 100px;">
+                            <span class="input-group-text">°</span>
+                        </div>
+                        <div class="small text-muted mt-1">1 to 90 degrees</div>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-4 text-end">
+                        <label for="imu_filter_buffer_size_input" class="col-form-label">IMU filter (stability)</label>
+                    </div>
+                    <div class="col-auto">
+                        <div class="input-group">
+                            <input type="number" min="1" max="16" id="imu_filter_buffer_size_input" class="form-control text-end" style="max-width: 100px;">
+                            <span class="input-group-text">samples</span>
+                        </div>
+                        <div class="small text-muted mt-1">1(reactive) to 16(stable)</div>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-4 text-end">
+                        <label for="imu_roll_inverted_checkbox" class="col-form-label">Invert roll axis</label>
+                    </div>
+                    <div class="col-auto">
+                        <input type="checkbox" id="imu_roll_inverted_checkbox" class="form-check-input align-middle">
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-4 text-end">
+                        <label for="imu_pitch_inverted_checkbox" class="col-form-label">Invert pitch axis</label>
+                    </div>
+                    <div class="col-auto">
+                        <input type="checkbox" id="imu_pitch_inverted_checkbox" class="form-check-input align-middle">
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <p><em>Changes to the emulated device type become active after disconnecting and reconnecting HID Remapper.</em></p>
+                    <p><em>Changes to gamepad input normalization are applied after re-plugging the device or HID Remapper.</em></p>
+                    <p><em>Changes to IMU enable setting are applied after re-plugging the device or HID Remapper.</em></p>
+                </div>
+
+                <h5 class="mt-4">Custom usages</h5>
+
+                <div id="quirks_container">
+
+                </div>
+                <div class="mt-4">
+                    <button id="add_quirk" type="button" class="btn btn-primary">Add usage</button>
+                </div>
+
+                <div class="row mt-3">
+                    <em>If both Vendor ID and Product ID are zero, usage applies to all interfaces on all devices.<br>
+                    Set size to zero to remove an existing usage.<br>
+                    Custom usages are only applied after re-plugging the device or HID Remapper.</em>
+                </div>
+            </div>
+
+            <div class="tab-pane" id="nav-macros" role="tabpanel" tabindex="0">
+
+                <div class="accordion mt-4" id="macros_container">
+
+                </div>
+
+            </div>
+
+            <div class="tab-pane" id="nav-expressions" role="tabpanel" tabindex="0">
+
+                <div class="mt-4" id="expressions_container">
+
+                </div>
+
+                <div class="row mt-4">
+                    <em>Expression /* comments */ are not saved to device, but they are preserved in exported JSON files.</em>
+                </div>
+            </div>
+
+            <div class="tab-pane" id="nav-actions" role="tabpanel" tabindex="0">
+
+                <div class="row mt-4">
+                    <div class="col-4">
+                        <button id="download_json" type="button" class="btn btn-primary w-100">Export JSON</button>
+                    </div>
+                    <div class="col-4">
+                        <button id="upload_json" type="button" class="btn btn-primary w-100">Import JSON</button>
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-4">
+                        <button id="flash_firmware" type="button" class="btn btn-primary w-100">Flash firmware</button>
+                    </div>
+                    <div class="col-4" id="flash_b_side_container">
+                        <button id="flash_b_side" type="button" class="btn btn-primary w-100">Flash B side</button>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="tab-pane" id="nav-monitor" role="tabpanel" tabindex="0">
+
+                <p class="mt-4">Interact with the device connected to HID Remapper to see what usage codes it generates.</p>
+
+                <div>
+                    <button id="monitor_clear" type="button" class="btn btn-primary">Clear</button>
+                </div>
+
+                <div id="monitor_header" class="row p-1 mt-4 mb-2 d-none">
+                    <div class="col-1 text-center"></div>
+                    <div class="col-2 text-center monitor_usage">Usage</div>
+                    <div class="col-3 text-center monitor_readable_name"></div>
+                    <div class="col-2 text-center monitor_last_value">Last value</div>
+                    <div class="col-2 text-center monitor_min_value">Min value</div>
+                    <div class="col-2 text-center monitor_max_value">Max value</div>
+                </div>
+
+                <div id="monitor_container">
+                </div>
+
+            </div>
+
+            <div class="tab-pane" id="nav-bluetooth" role="tabpanel" tabindex="0">
+
+                <h5 class="mt-4">BLE input devices</h5>
+
+                <p class="text-muted">Pair physical Bluetooth LE gamepads and controllers with HID Remapper. Requires an nRF52840 board (Feather or Xiao). This uses USB (Open device), not Web Bluetooth. Put the controller in pairing mode, then click Pair new device. On Seeed Xiao without the web tool, short pin 0 to GND (short press to pair, hold &gt; 3 s to forget all).</p>
+
+                <div id="ble_input_status" class="alert alert-secondary mt-2">Open a Bluetooth-capable HID Remapper with Open device first.</div>
+
+                <ul class="text-muted small mb-3" id="ble_led_legend">
+                    <li><strong>LED solid ON</strong> — scanning for a new device to pair (nRF52840 only)</li>
+                    <li><strong>LED blinking</strong> — reconnecting to bonded devices, or idle with no connections (nRF52840 only)</li>
+                    <li><strong>N blinks per cycle</strong> — N BLE input devices currently connected (nRF52840 only)</li>
+                    <li><strong>LED brief flash</strong> — NUS input received (Pico W / Pico 2 W)</li>
+                </ul>
+
+                <div class="row">
+                    <div class="col-4" id="pair_new_device_container">
+                        <button id="pair_new_device" type="button" class="btn btn-primary w-100" disabled>Pair new device</button>
+                    </div>
+                    <div class="col-4" id="clear_bonds_container">
+                        <button id="clear_bonds" type="button" class="btn btn-primary w-100" disabled>Forget all devices</button>
+                    </div>
+                </div>
+
+                <h5 class="mt-4">NUS tester</h5>
+
+                <p class="text-muted">Send virtual test gamepad input from this browser over Web Bluetooth (Nordic UART Service). This does not pair physical controllers — use BLE input devices above for that. The first write may trigger a browser pairing prompt so the BLE link can be encrypted.</p>
+
+                <div class="row g-2 align-items-center">
+                    <div class="col-auto">
+                        <button id="nus_connect" type="button" class="btn btn-primary">Connect</button>
+                    </div>
+                    <div class="col-auto">
+                        <button id="nus_connect_filtered" type="button" class="btn btn-outline-primary">Connect by NUS UUID</button>
+                    </div>
+                    <div class="col-auto">
+                        <button id="nus_pair" type="button" class="btn btn-outline-primary" disabled>Pair / test write</button>
+                    </div>
+                    <div class="col-auto">
+                        <button id="nus_disconnect" type="button" class="btn btn-outline-primary" disabled>Disconnect</button>
+                    </div>
+                    <div class="col-auto">
+                        <div class="input-group">
+                            <label class="input-group-text" for="nus_descriptor">Descriptor</label>
+                            <select id="nus_descriptor" class="form-select">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="nus_status" class="alert alert-secondary mt-3">Disconnected. Use Connect first; the first write may ask to pair so the BLE link can be encrypted.</div>
+
+                <div class="card mt-3">
+                    <div class="card-body">
+                        <h6 class="card-title">Buttons</h6>
+                        <div class="d-flex flex-wrap gap-2">
+                            <button type="button" class="btn btn-outline-primary" data-nus-button="0">A</button>
+                            <button type="button" class="btn btn-outline-primary" data-nus-button="1">B</button>
+                            <button type="button" class="btn btn-outline-primary" data-nus-button="2">X</button>
+                            <button type="button" class="btn btn-outline-primary" data-nus-button="3">Y</button>
+                            <button type="button" class="btn btn-outline-primary" data-nus-button="4">L1</button>
+                            <button type="button" class="btn btn-outline-primary" data-nus-button="5">R1</button>
+                            <button id="nus_neutral" type="button" class="btn btn-outline-secondary">Send neutral</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mt-3">
+                    <div class="card-body">
+                        <h6 class="card-title">D-pad</h6>
+                        <div class="d-flex flex-wrap gap-2">
+                            <button type="button" class="btn btn-outline-primary" data-nus-hat="0">Up</button>
+                            <button type="button" class="btn btn-outline-primary" data-nus-hat="2">Right</button>
+                            <button type="button" class="btn btn-outline-primary" data-nus-hat="4">Down</button>
+                            <button type="button" class="btn btn-outline-primary" data-nus-hat="6">Left</button>
+                            <button type="button" class="btn btn-outline-primary" data-nus-hat="15">Center</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mt-3 mb-4">
+                    <div class="card-body">
+                        <h6 class="card-title">Axes</h6>
+                        <div class="row">
+                            <div class="col-6 col-md-3">
+                                <label for="nus_axis_x" class="form-label">X</label>
+                                <input id="nus_axis_x" type="range" class="form-range nus_axis" min="0" max="255" value="128" data-nus-axis="3">
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <label for="nus_axis_y" class="form-label">Y</label>
+                                <input id="nus_axis_y" type="range" class="form-range nus_axis" min="0" max="255" value="128" data-nus-axis="4">
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <label for="nus_axis_z" class="form-label">Z</label>
+                                <input id="nus_axis_z" type="range" class="form-range nus_axis" min="0" max="255" value="128" data-nus-axis="5">
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <label for="nus_axis_rz" class="form-label">Rz</label>
+                                <input id="nus_axis_rz" type="range" class="form-range nus_axis" min="0" max="255" value="128" data-nus-axis="6">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="tab-pane" id="nav-examples" role="tabpanel" tabindex="0">
+
+                <ul id="examples" class="mt-4 list-group">
+
+                </ul>
+
+            </div>
+
+        </div>
+
+        <div class="text-center text-muted mt-4 mb-4">
+            For more information, see <a class="text-reset" href="https://www.remapper.org/">remapper.org</a>.
+        </div>
+
+    </div>
+
+    <template id="mapping_template">
+        <div class="row mb-1 mapping_container">
+            <div class="col-1"><button type="button" class="btn btn-primary delete_button">×</button></div>
+            <div class="col-3">
+                <button type="button" class="btn btn-primary w-100 source_button position-relative">
+                    <span class="position-absolute top-50 start-0 translate-middle badge bg-info rounded-pill hub_port_badge">0</span>
+                    <span class="button_label">source</span>
+                </button>
+            </div>
+            <div class="col-3">
+                <button type="button" class="btn btn-primary w-100 target_button position-relative">
+                    <span class="position-absolute top-50 start-0 translate-middle badge bg-info rounded-pill hub_port_badge">0</span>
+                    <span class="button_label">target</span>
+                </button>
+            </div>
+            <div class="col-3">
+                <div class="d-flex lh-1 text-center">
+                    <div class="flex-fill row gx-1 justify-content-center">
+                        <div class="col-auto">
+                            <input class="form-check-input layer_checkbox0" type="checkbox" value="">
+                            <br><span class="text-muted small">0</span>
+                        </div>
+                        <div class="col-auto">
+                            <input class="form-check-input layer_checkbox1" type="checkbox" value="">
+                            <br><span class="text-muted small">1</span>
+                        </div>
+                        <div class="col-auto">
+                            <input class="form-check-input layer_checkbox2" type="checkbox" value="">
+                            <br><span class="text-muted small">2</span>
+                        </div>
+                        <div class="col-auto">
+                            <input class="form-check-input layer_checkbox3" type="checkbox" value="">
+                            <br><span class="text-muted small">3</span>
+                        </div>
+                        <div class="col-auto d-none">
+                            <input class="form-check-input layer_checkbox4" type="checkbox" value="">
+                            <br><span class="text-muted small">4</span>
+                        </div>
+                        <div class="col-auto d-none">
+                            <input class="form-check-input layer_checkbox5" type="checkbox" value="">
+                            <br><span class="text-muted small">5</span>
+                        </div>
+                        <div class="col-auto d-none">
+                            <input class="form-check-input layer_checkbox6" type="checkbox" value="">
+                            <br><span class="text-muted small">6</span>
+                        </div>
+                        <div class="col-auto d-none">
+                            <input class="form-check-input layer_checkbox7" type="checkbox" value="">
+                            <br><span class="text-muted small">7</span>
+                        </div>
+                    </div>
+                    <div class="row gx-1">
+                        <div class="col-auto ms-1" title="Sticky">
+                            <input class="form-check-input sticky_checkbox" type="checkbox" value="">
+                            <br><span class="text-muted small">S</span>
+                        </div>
+                        <div class="col-auto" title="Tap">
+                            <input class="form-check-input tap_checkbox" type="checkbox" value="">
+                            <br><span class="text-muted small">T</span>
+                        </div>
+                        <div class="col-auto" title="Hold">
+                            <input class="form-check-input hold_checkbox" type="checkbox" value="">
+                            <br><span class="text-muted small">H</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-2"><input class="form-control scaling_input text-end" type="number"></div>
+        </div>
+    </template>
+
+    <template id="usage_button_template">
+        <button type="button" class="btn btn-primary usage_button m-1"></button>
+    </template>
+
+    <template id="example_template">
+        <li class="list-group-item border border-0"><a class="text-muted" href="javascript:void(0);"></a></li>
+    </template>
+
+    <template id="macro_template">
+        <div class="accordion-item" id="macro_N">
+            <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_X">
+                    <span class="macro_name flex-shrink-0">Macro N</span>
+                    <span class="macro_preview text-muted px-3 flex-fill text-truncate"></span>
+                </button>
+            </h2>
+            <div id="collapse_X" class="accordion-collapse collapse" data-bs-parent="#macros_container">
+                <div class="accordion-body">
+                    <div class="macro_entries">
+                    </div>
+                    <div class="mt-1">
+                        <button type="button" class="add_macro_entry btn btn-outline-primary">+</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <template id="macro_entry_template">
+        <div class="macro_entry row g-1 mt-1">
+
+            <div class="add_item_container col-auto">
+                <button type="button" class="add_macro_item btn btn-outline-primary">+</button>
+            </div>
+        </div>
+    </template>
+
+    <template id="macro_item_template">
+        <div class="btn-group macro_item col-auto">
+            <button type="button" class="delete_macro_item btn btn-primary">×</button>
+            <button type="button" class="macro_item_usage btn btn-primary" data-hid-usage="0x00000000">
+                <span class="button_label">Nothing</span>
+            </button>
+        </div>
+    </template>
+
+    <template id="expression_template">
+        <div class="mb-3">
+            <label class="form-label expression_label">Expression</label>
+            <textarea type="text" class="form-control expression_input font-monospace" rows="1" spellcheck="false"></textarea>
+        </div>
+    </template>
+
+    <template id="monitor_template">
+        <div class="row monitor_row p-1 my-2 rounded">
+            <div class="col-1"><button type="button" title="map this" class="btn btn-sm btn-primary map_this_button" style="padding: 0rem 0.4rem;">+</button></div>
+            <div class="col-2 text-center monitor_usage position-relative">
+                <span class="position-absolute top-50 start-0 translate-middle badge bg-info rounded-pill hub_port_badge">0</span>
+                <span class="font-monospace usage_label"></span>
+            </div>
+            <div class="col-3 text-center monitor_readable_name"></div>
+            <div class="col-2 text-end monitor_last_value"></div>
+            <div class="col-2 text-end monitor_min_value"></div>
+            <div class="col-2 text-end monitor_max_value"></div>
+        </div>
+    </template>
+
+    <template id="quirk_template">
+        <div>
+            <div class="row">
+                <div class="col-1 pt-3">
+                    <button type="button" class="btn btn-primary delete_button">×</button>
+                </div>
+                <div class="col-3">
+                    <label class="col-form-label">Vendor ID</label>
+                    <div class="input-group">
+                        <span class="input-group-text">0x</span>
+                        <input type="text" class="form-control vendor_id_input text-end">
+                    </div>
+                </div>
+                <div class="col-3">
+                    <label class="col-form-label">Product ID</label>
+                    <div class="input-group">
+                        <span class="input-group-text">0x</span>
+                        <input type="text" class="form-control product_id_input text-end">
+                    </div>
+                </div>
+                <div class="col-2">
+                    <label class="col-form-label">Interface</label>
+                    <input type="number" min="0" max="255" class="form-control interface_input text-end">
+                </div>
+                <div class="col-2">
+                    <label class="col-form-label">Report ID</label>
+                    <input type="number" min="0" max="255" class="form-control report_id_input text-end">
+                </div>
+            </div>
+            <div class="row mb-4">
+                <div class="col-1">
+                </div>
+                <div class="col-3 pt-4">
+                    <div class="form-check">
+                        <input class="form-check-input relative_checkbox" type="checkbox" value="">
+                        <label class="form-check-label relative_checkbox_label">Relative</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input signed_checkbox" type="checkbox" value="">
+                        <label class="form-check-label signed_checkbox_label">Signed</label>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <label class="col-form-label">Usage</label>
+                    <div class="input-group">
+                        <span class="input-group-text">0x</span>
+                        <input type="text" class="form-control usage_input text-end">
+                    </div>
+                </div>
+                <div class="col-2">
+                    <label class="col-form-label">Size</label>
+                    <input type="number" min="0" max="32" class="form-control size_input text-end">
+                </div>
+                <div class="col-2">
+                    <label class="col-form-label">Position</label>
+                    <input type="number" min="0" max="511" class="form-control bitpos_input text-end">
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <div id="source_usage_modal" class="modal fade" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title usage_modal_title">Select input</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" style="overflow-y: scroll;">
+                    <div class="row hub_port_container">
+                        <div class="col-auto">
+                            <label for="source_port_dropdown" class="col-form-label">Port</label>
+                        </div>
+                        <div class="col-auto">
+                            <select class="form-select hub_port_dropdown" id="source_port_dropdown">
+                                <option value="0">all</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                                <option value="9">9</option>
+                                <option value="10">10</option>
+                                <option value="11">11</option>
+                                <option value="12">12</option>
+                                <option value="13">13</option>
+                                <option value="14">14</option>
+                                <option value="15">15</option>
+                            </select>
+                        </div>
+                        <div class="col">
+                        </div>
+                        <div class="col-auto">
+                            <label for="input_labels_modal_dropdown" class="col-form-label">Input labels</label>
+                        </div>
+                        <div class="col-auto">
+                            <select class="form-select" id="input_labels_modal_dropdown">
+                                <option value="0">mouse</option>
+                                <option value="1">gamepad</option>
+                            </select>
+                        </div>
+                        <div class="col">
+                        </div>
+                        <div class="col-3 position-relative">
+                            <span class="position-absolute top-50 start-100 badge bg-success rounded-pill have_preferred_result_checkmark d-none" style="translate: -100% -50%">&check;</span>
+                            <input type="text" class="form-control usage_search_box" placeholder="Search">
+                        </div>
+                    </div>
+                    <div class="col mouse_usages mt-3">
+                    </div>
+                    <div class="col gamepad_usages mt-3">
+                    </div>
+                    <div class="col keyboard_usages mt-3">
+                    </div>
+                    <div class="col media_usages mt-3">
+                    </div>
+                    <div class="col other_usages mt-3">
+                    </div>
+                    <div class="col extra_usages mt-3">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="target_usage_modal" class="modal fade" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title usage_modal_title">Select output</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" style="overflow-y: scroll;">
+                    <div class="row hub_port_container">
+                        <div class="col-auto hub_port_inputs">
+                            <label for="target_port_dropdown" class="col-form-label">Port</label>
+                        </div>
+                        <div class="col-auto hub_port_inputs">
+                            <select class="form-select hub_port_dropdown" id="target_port_dropdown">
+                                <option value="0">all</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                                <option value="9">9</option>
+                                <option value="10">10</option>
+                                <option value="11">11</option>
+                                <option value="12">12</option>
+                                <option value="13">13</option>
+                                <option value="14">14</option>
+                                <option value="15">15</option>
+                            </select>
+                        </div>
+                        <div class="col">
+                        </div>
+                        <div class="col-3 position-relative">
+                            <span class="position-absolute top-50 start-100 badge bg-success rounded-pill have_preferred_result_checkmark d-none" style="translate: -100% -50%">&check;</span>
+                            <input type="text" class="form-control usage_search_box" placeholder="Search">
+                        </div>
+                    </div>
+                    <div class="col mouse_usages mt-3">
+                    </div>
+                    <div class="col gamepad_usages mt-3">
+                    </div>
+                    <div class="col keyboard_usages mt-3">
+                    </div>
+                    <div class="col media_usages mt-3">
+                    </div>
+                    <div class="col other_usages mt-3">
+                    </div>
+                    <div class="col extra_usages mt-3">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <input type="file" class="d-none" id="file_input">
+
+</body>
+
+</html>
